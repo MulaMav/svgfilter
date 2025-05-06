@@ -11,38 +11,213 @@
 
     <title>Maverick</title>
 
-    
+   
     
 </head>
 <body>
-    <h1>Some beautiful atrs and how cool this funcation is</h1>
+    <h1>Generate 111w1 q   yourart
+    </h1>
 
     
-    <svg xmlns="http://www.w3.org/2000/svg">
-    <defs>
-    
+    <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute; width:0; height:0;">
+        <defs>
+
+        
+        <!-- firstLayer -->
         <filter id="noise" x='0%' y='0%' width='100%' height='100%'>
-            <feTurbulence baseFrequency="0.05 0.07" result="noise1" numOctaves="1" id="firstlayoutTurbulence"/>
-            <feDisplacementMap in="SourceGraphic" in2="noise1" scale="0"></feDisplacementMap>
+            <feTurbulence  baseFrequency="0.05 0.07" result="noise1" numOctaves="1" id="firstlayoutTurbulence"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise1" scale="0" id="firstlayoutDisplacement"></feDisplacementMap>
+         </filter>
 
-       
-        </filter>
+         <!-- secondLayer -->
+
+         
+         <filter id="bloomFilter" x="-50%" y="-50%" width="200%" height="200%">
+            <!-- 1. 亮度→Alpha -->
+            <feColorMatrix in="SourceGraphic"
+                           type="luminanceToAlpha"
+                           result="alphaMask"/>
+            <!-- 2. 阈值掩码 -->
+            <feComponentTransfer in="alphaMask" result="thresholdMask">
+              <feFuncA type="linear"
+                       slope="3"         
+                       intercept="-0.5"  
+                       id="bloomFunc"/>
+            </feComponentTransfer>
+            <!-- 3. 模糊发光 -->
+            <feGaussianBlur in="thresholdMask"
+                            stdDeviation="8"
+                            result="blurMask"
+                            id="bloomBlur"/>
+            <!-- 4. 上色 -->
+            <feFlood flood-color="#ffffff"
+                     flood-opacity="1"
+                     result="colorLayer"
+                     id="bloomColor"/>
+            <feComposite in="colorLayer"
+                         in2="blurMask"
+                         operator="in"
+                         result="colorGlow"/>
+            <!-- 5. 叠加到原图上 -->
+            <feBlend in="SourceGraphic"
+                     in2="colorGlow"
+                     mode="screen"/>
+          </filter>
+
+          <filter id="glitchFilter" x="0%" y="0%" width="100%" height="100%">
+            <!-- 提取 R 通道 -->
+            <feColorMatrix in="SourceGraphic" type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0" result="redChannel"/>
+            <feOffset in="redChannel" dx="0" dy="0" result="redOffset" id="redOffset"/>
+    
+            <!-- 提取 G 通道 -->
+            <feColorMatrix in="SourceGraphic" type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0" result="greenChannel"/>
+            <feOffset in="greenChannel" dx="0" dy="0" result="greenOffset" id="greenOffset"/>
+    
+            <!-- 提取 B 通道 -->
+            <feColorMatrix in="SourceGraphic" type="matrix"
+              values="0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0" result="blueChannel"/>
+            <feOffset in="blueChannel" dx="0" dy="0" result="blueOffset" id="blueOffset"/>
+    
+            <!-- 叠加通道 -->
+            <feBlend in="redOffset"   in2="greenOffset" mode="screen" result="rg"/>
+            <feBlend in="rg"          in2="blueOffset"  mode="screen"/>
+          </filter>
+
+
+            </defs>
+          
 
 
     </svg>
 
-    <div class="overlay">
-        <div class="container"> 
-            <img src="1.jpg" alt="1" class="pic">
-            <img src="2.jpg" alt="2" class="pic">
-            <img src="3.jpg" alt="3" class="pic">
-        </div>
        
-        <input type="range" min="0.01" max="0.3" id="filterControlOne" step="0.01" />
-        <input type="range" min="1" max="10" id="filterControlTwo" step="1" />
-        <input type="range" min="0" max="30" id="filterControlThree" step="1" />
-        <input type="range" min="0" max="1" id="filterControlFour" step="0.01" />
-    </div>
+        <div class="overlay">
+            <div class="container"> 
+              <img src="1.jpg" alt="1" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter);" />
+              <img src="2.jpg" alt="2" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter);"/>
+              <img src="3.jpg" alt="3" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter);"/>
+            </div>
+          
+            
+            <div class="control-panel">
+                <div class="control-group">
+                  <label for="filterControlOne3">Displacement</label>
+                  <input type="range" min="0" max="200" value="0" id="filterControlOne3" step="0.5" />
+                  <span id="valueThree">0</span>
+                </div>
+              
+                <div class="control-group">
+                  <label for="filterControlOne1">Freq X</label>
+                  <input type="range" min="0.01" max="0.3" value="0" id="filterControlOne1" step="0.01" />
+                  <span id="valueOne">0.05</span>
+                </div>
+              
+                <div class="control-group">
+                  <label for="filterControlOne2">Seed</label>
+                  <input type="range" min="1" max="10" value="0" id="filterControlOne2" step="1" />
+                  <span id="valueTwo">1</span>
+                </div>
+              
+                <div class="control-group">
+                  <label for="filterControlOne4">Octaves</label>
+                  <input type="range" min="0" max="150" value="0" id="filterControlOne4" step="0.001" />
+                  <span id="valueFour">0</span>
+                </div>
+
+                <div class="control-group">
+                    <label for="noiseTypeControl">Noise Type</label>
+                    <select id="noiseTypeControl">
+                      <option value="turbulence">Turbulence</option>
+                      <option value="fractalNoise">Fractal Noise</option>
+                    </select>
+                  </div>
+              
+                <button id="resetButton">Reset</button>
+                
+              </div>
+
+              <div class="control-panel">
+                <!-- Glow Size -->
+                <div class="control-group">
+                  <label for="glowSizeControl">Glow Size</label>
+                  <input type="range" id="glowSizeControl" min="0" max="20" step="1" value="5"/>
+                  <span id="valueGlowSize">5</span>
+                </div>
+              
+                <!-- Glow Spread -->
+                <div class="control-group">
+                  <label for="glowSpreadControl">Glow Spread</label>
+                  <input type="range" id="glowSpreadControl" min="0.5" max="5" step="0.1" value="2"/>
+                  <span id="valueGlowSpread">2</span>
+                </div>
+              
+                <!-- Threshold -->
+                <div class="control-group">
+                  <label for="thresholdControl">Threshold</label>
+                  <input type="range" id="thresholdControl" min="0" max="3" step="0.01" value="3"/>
+                  <span id="valueThreshold">3</span>
+                </div>
+              
+                <!-- Glow Color -->
+                <div class="control-group">
+                  <label for="glowColorControl">Glow Color</label>
+                  <input type="color" id="glowColorControl" value="#ffffff"/>
+                  <span id="valueGlowColor">#ffffff</span>
+                </div>
+              
+                <!-- Glow Opacity -->
+                <div class="control-group">
+                  <label for="glowOpacityControl">Glow Opacity</label>
+                  <input type="range" id="glowOpacityControl" min="0" max="1" step="0.01" value="0"/>
+                  <span id="valueOpacity">0</span>
+                </div>
+              </div>
+
+              
+              <div class="control-panel">
+                <div class="control-group">
+                  <label for="redOffsetControl">Red Offset</label>
+                  <input type="range" id="redOffsetControl" min="-20" max="20" step="1" value="0"/>
+                  <span id="valueRed">0</span>
+                </div>
+                <div class="control-group">
+                  <label for="greenOffsetControl">Green Offset</label>
+                  <input type="range" id="greenOffsetControl" min="-20" max="20" step="1" value="0"/>
+                  <span id="valueGreen">0</span>
+                </div>
+                <div class="control-group">
+                  <label for="blueOffsetControl">Blue Offset</label>
+                  <input type="range" id="blueOffsetControl" min="-20" max="20" step="1" value="0"/>
+                  <span id="valueBlue">0</span>
+                </div>
+                <div class="control-group">
+                  <label for="multiplierControl">Global Strength</label>
+                  <input type="range" id="multiplierControl" min="0" max="3" step="0.1" value="1"/>
+                  <span id="valueMultiplier">1</span>
+                </div>
+                <div class="control-group">
+                  <label for="glitchModeControl">Glitch Mode</label>
+                  <select id="glitchModeControl">
+                    <option value="horizontal">Horizontal</option>
+                    <option value="vertical">Vertical</option>
+                    <option value="random">Random</option>
+                  </select>
+                </div>
+              </div>
+
+                  </div>
+
     
 </body>
 </html>

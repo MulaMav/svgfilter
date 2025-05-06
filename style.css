@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Playfair+Display&display=swap');
 
-bbody {
+body {
     margin: 0;
     height: 100vh;
     position: relative;
@@ -9,16 +9,13 @@ bbody {
 
 h1 {
     width: 30%;
-    font-size: 7em;
+    font-size: 8.5em;
     text-align: center;
     line-height: 2em;
-    margin: 0 auto;
+    margin: 55vh;
     color: rgb(202, 202, 202);
     font-weight: normal;
-  }
-
-  .drag-active{
-    cursor: grabbing;
+    margin-top: -5vh;
   }
 
 svg {
@@ -33,20 +30,77 @@ svg {
     display: grid;
     grid-template-columns: repeat(3, auto);
     align-items: center;
-    height: 100vh;
+    height: 95vh;
     width: 80%;
     margin: 0 auto;
+    margin-top: 1px;
 }
-
 
 img {
     width: 100%;
+    margin-top:80px;
     filter: url(#noise);
-
+    filter: url(#bloomFilter);
+    filter: url(#glitchFilter);
+    
 }
 
-#xyControlBox{
-    width: 150rem; height: 150rem;
-    background-color: var(--col01);
-  }
+
+
+.control-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 60px; /* 每项之间的间距 */
+  padding: 10px 20px;
+  font-family: 'Arial', sans-serif;
+  font-size: 0.75rem; /* 小字体 */
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 150px;
+  max-width: 200px;
+}
+
+.control-group label {
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: #444;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+}
+
+.control-group span {
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+#resetButton {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  background-color: #222;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  height: fit-content;
+  margin-top: 20px;
+}
+
+#resetButton:hover {
+  background-color: #444;
+}
+
+
+  
+
+  
   

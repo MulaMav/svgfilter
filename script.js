@@ -96,6 +96,38 @@ document.getElementById("redOffsetControl").addEventListener("input", e => {
     setGlitchMode(v);
   });
   
+  document.getElementById("wcDispControl").addEventListener("input", e => {
+    const v = e.target.value;
+    document.getElementById("valueDisp").textContent = v;
+    setWatercolorDisplacement(v);
+  });
+  
+  // Blur
+  document.getElementById("wcBlurControl").addEventListener("input", e => {
+    const v = e.target.value;
+    document.getElementById("valueBlur").textContent = v;
+    setWatercolorBlur(v);
+  });
+  
+  // Saturation
+  document.getElementById("wcSatControl").addEventListener("input", e => {
+    const v = e.target.value;
+    document.getElementById("valueSat").textContent = parseFloat(v).toFixed(1);
+    setWatercolorSaturation(v);
+  });
+  
+  // Contrast
+  document.getElementById("wcContrastControl").addEventListener("input", e => {
+    const v = e.target.value;
+    document.getElementById("valueContrast").textContent = parseFloat(v).toFixed(1);
+    setWatercolorContrast(v);
+  });
+
+  document.getElementById("wcTextureControl").addEventListener("input", e => {
+    const v = e.target.value;
+    document.getElementById("valueTexture").textContent = v;
+    setWatercolorTexture(v);
+  });
   
 
 
@@ -113,7 +145,12 @@ document.getElementById("redOffsetControl").addEventListener("input", e => {
     redOffsetControl:0,
     greenOffsetControl:0,
     blueOffsetControl:0,
-    multiplierControl:1.5
+    multiplierControl:1.5,
+    wcDispControl:0, 
+    wcBlurControl:0,
+    wcSatControl:1,
+    wcContrastControl:1,
+    wcTextureControl:0.03
 
 
 
@@ -140,3 +177,60 @@ document.getElementById("redOffsetControl").addEventListener("input", e => {
   window.addEventListener("load", () => {
     document.getElementById("resetButton").click();
   });
+
+  const uploadInput = document.getElementById('uploadImage');
+uploadInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const container = document.querySelector('.overlay .container');
+    // 单列布局、最大宽度 400px、居中
+    container.style.display = 'block';
+    container.style.maxWidth = '70vw';
+    container.style.margin = '-20px auto';
+    
+    // 插入单张可滤镜调整的图片
+    container.innerHTML = `
+      <img
+        src="${ev.target.result}"
+        alt="uploaded"
+        class="pic"
+        style="
+          width: 100%;
+          height: auto;
+          filter:
+            url(#noise)
+            url(#bloomFilter)
+            url(#glitchFilter)
+            url(#watercolorFilter);
+        "
+      />
+    `;
+  };
+  reader.readAsDataURL(file);
+});
+
+// 3. 下载第一张带滤镜的图片
+const downloadBtn = document.getElementById('downloadButton');
+downloadBtn.addEventListener('click', () => {
+  const img = pics[0];
+  if (!img.src) return alert('请先上传图片');
+  const w = img.naturalWidth, h = img.naturalHeight;
+  const defs = document.querySelector('#filterSvg defs').innerHTML;
+  const filterAttr = img.style.filter || 'url(#noise) url(#bloomFilter) url(#glitchFilter) url(#watercolorFilter)';
+  const svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${w}\" height=\"${h}\">` +
+              `<defs>${defs}</defs>` +
+              `<image href=\"${img.src}\" width=\"${w}\" height=\"${h}\" filter=\"${filterAttr}\"/>` +
+              `</svg>`;
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  const tmp = new Image();
+  tmp.onload = () => { ctx.drawImage(tmp, 0, 0); URL.revokeObjectURL(url);
+    const png = canvas.toDataURL('image/png');
+    const a = document.createElement('a'); a.href = png; a.download = 'filtered-image.png'; a.click();
+  };
+  tmp.src = url;
+});

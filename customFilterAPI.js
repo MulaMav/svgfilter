@@ -7,6 +7,13 @@ const bloomColor = document.getElementById("bloomColor");   // feFlood 节点
 const redOffsetNode   = document.getElementById("redOffset");
 const greenOffsetNode = document.getElementById("greenOffset");
 const blueOffsetNode  = document.getElementById("blueOffset");
+const wcDisplace = document.getElementById("wcDisplace");
+const wcBlur     = document.getElementById("wcBlur");
+const wcSat      = document.getElementById("wcSat");
+const wcGammaR   = document.getElementById("wcGammaR");
+const wcGammaG   = document.getElementById("wcGammaG");
+const wcGammaB   = document.getElementById("wcGammaB");
+const wcTexture = document.getElementById("wcTexture");
 
 
 // 设置 baseFrequency 的 X 值（Y 值保持固定）
@@ -116,4 +123,30 @@ function setGlobalStrength(v) {
 function setGlitchMode(v) {
   glitchMode = v;
   applyOffsets();
+}
+
+// Displacement
+function setWatercolorDisplacement(v) {
+  wcDisplace.setAttribute("scale", v);
+}
+
+// Blur
+function setWatercolorBlur(v) {
+  wcBlur.setAttribute("stdDeviation", v);
+}
+
+// Saturation
+function setWatercolorSaturation(v) {
+  wcSat.setAttribute("values", v);
+}
+
+// Contrast (Gamma)
+function setWatercolorContrast(v) {
+  wcGammaR.setAttribute("exponent", v);
+  wcGammaG.setAttribute("exponent", v);
+  wcGammaB.setAttribute("exponent", v);
+}
+
+function setWatercolorTexture(v) {
+  wcTexture.setAttribute("baseFrequency", `${v} ${v}`);
 }

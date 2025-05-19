@@ -5,17 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Campatible" contant="ie=edge">
     <link rel="stylesheet" href="style.css">
-
-    <script src="customFilterAPI.js" defer></script>
-    <script src="script.js" defer></script>
-
+ <!-- 可选：Konva 引入 -->
+ <script src="https://unpkg.com/konva@^8/konva.min.js"></script>
+ <!-- 滤镜定义注入脚本 -->
+ <script src="customFilterAPI.js" defer></script>
+ <script src="script.js" defer></script>
+ <title>Image Filter App</title>
     <title>Maverick</title>
 
    
     
 </head>
-<body>
-    <h1>Generate 111w1 q   yourart
+
+ <!-- Full-screen intro overlay -->
+ <div id="intro">
+  <div id="intro-content">
+    <h1>欢迎访问我的网站</h1>
+    <button id="startBtn">CLOSE</button>
+  </div>
+</div>
+
+<!-- Header marquee -->
+<header id="header">
+  <div class="marquee">
+    <div class="marquee-inner">
+      <!-- 原始三个段落 -->
+      <span>welcome —— </span>
+      <span>generate your own art —— </span>
+      <span>welcome —— </span>
+      <!-- 重复以实现无缝循环 -->
+      <span>generate your own art —— </span>
+      <span>welcome —— </span>
+      <span>generate your own art —— </span>
+    </div>
+  </div>
+</header>
+
+  <script src="script2.js"></script>
+  
+    <h1>Generate 111111   yourart
     </h1>
 
     
@@ -64,6 +92,8 @@
                      mode="screen"/>
           </filter>
 
+          <!-- thirdLayer -->
+
           <filter id="glitchFilter" x="0%" y="0%" width="100%" height="100%">
             <!-- 提取 R 通道 -->
             <feColorMatrix in="SourceGraphic" type="matrix"
@@ -94,6 +124,23 @@
             <feBlend in="rg"          in2="blueOffset"  mode="screen"/>
           </filter>
 
+           <!-- fourthLayer -->
+
+           <filter id="watercolorFilter" x="-50%" y="-50%" width="200%" height="200%">
+            <feTurbulence id="wcTexture" type="fractalNoise" baseFrequency="0.02 0.02" numOctaves="2" result="tex" />
+            <feDisplacementMap in="SourceGraphic" in2="tex" scale="10" result="disp" id="wcDisplace" />
+            <feGaussianBlur in="disp" stdDeviation="2" result="blur" id="wcBlur" />
+            <feColorMatrix in="blur" type="saturate" values="1" result="sat" id="wcSat" />
+            <feComponentTransfer in="sat" result="final">
+              <feFuncR
+                id="wcGammaR" type="gamma" amplitude="1" exponent="1.0" offset="0" />
+              <feFuncG
+                id="wcGammaG" type="gamma" amplitude="1" exponent="1.0" offset="0" /> 
+              <feFuncB
+                id="wcGammaB" type="gamma" amplitude="1" exponent="1.0" offset="0" />
+            </feComponentTransfer>
+          </filter>
+
 
             </defs>
           
@@ -104,10 +151,13 @@
        
         <div class="overlay">
             <div class="container"> 
-              <img src="1.jpg" alt="1" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter);" />
-              <img src="2.jpg" alt="2" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter);"/>
-              <img src="3.jpg" alt="3" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter);"/>
+              <img src="1.jpg" alt="1" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter) url(#watercolorFilter);" />
+              <img src="2.jpg" alt="2" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter) url(#watercolorFilter);"/>
+              <img src="3.jpg" alt="3" class="pic" style="filter: url(#noise) url(#bloomFilter) url(#glitchFilter) url(#watercolorFilter);"/>
             </div>
+
+            <input type="file" id="uploadImage" accept="image/*" />
+            <button id="downloadButton">dowload</button>
           
             
             <div class="control-panel">
@@ -214,7 +264,37 @@
                     <option value="random">Random</option>
                   </select>
                 </div>
-              </div>
+
+              
+                <div class="control-panel">
+                  <!-- 原有四个控制组… -->
+                  <div class="control-group">
+                    <label for="wcDispControl">Displacement</label>
+                    <input type="range" id="wcDispControl" min="0" max="30" step="1" value="10"/>
+                    <span id="valueDisp">10</span>
+                  </div>
+                  <div class="control-group">
+                    <label for="wcBlurControl">Blur</label>
+                    <input type="range" id="wcBlurControl" min="0" max="10" step="0.5" value="2"/>
+                    <span id="valueBlur">2</span>
+                  </div>
+                  <div class="control-group">
+                    <label for="wcSatControl">Saturation</label>
+                    <input type="range" id="wcSatControl" min="0" max="3" step="0.1" value="1"/>
+                    <span id="valueSat">1.0</span>
+                  </div>
+                  <div class="control-group">
+                    <label for="wcContrastControl">Contrast</label>
+                    <input type="range" id="wcContrastControl" min="0.1" max="3" step="0.1" value="1"/>
+                    <span id="valueContrast">1.0</span>
+                  </div>
+                  <!-- 新增：Texture Scale 控制组 -->
+                  <div class="control-group">
+                    <label for="wcTextureControl">Texture Scale</label>
+                    <input type="range" id="wcTextureControl" min="0.001" max="0.1" step="0.001" value="0.02"/>
+                    <span id="valueTexture">0.02</span>
+                  </div>
+                </div>
 
                   </div>
 

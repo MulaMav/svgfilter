@@ -132,7 +132,7 @@ document.getElementById("redOffsetControl").addEventListener("input", e => {
 
 
   
-  // 默认值定义
+  
   const defaultValues = {
     filterControlOne1: 0.05,
     filterControlOne2: 1,
@@ -165,10 +165,10 @@ document.getElementById("redOffsetControl").addEventListener("input", e => {
       const value = defaultValues[id];
       input.value = value;
   
-      // 手动触发 input 事件以更新滤镜
+   
       input.dispatchEvent(new Event("input"));
   
-      // 更新显示数值（如果你使用了 span 来展示当前值）
+      
       const valueSpan = document.getElementById("value" + id.slice(-1));
       if (valueSpan) valueSpan.textContent = value;
     }
@@ -185,12 +185,11 @@ uploadInput.addEventListener('change', e => {
   const reader = new FileReader();
   reader.onload = ev => {
     const container = document.querySelector('.overlay .container');
-    // 单列布局、最大宽度 400px、居中
+   
     container.style.display = 'block';
     container.style.maxWidth = '70vw';
     container.style.margin = '-20px auto';
     
-    // 插入单张可滤镜调整的图片
     container.innerHTML = `
       <img
         src="${ev.target.result}"
@@ -211,26 +210,91 @@ uploadInput.addEventListener('change', e => {
   reader.readAsDataURL(file);
 });
 
-// 3. 下载第一张带滤镜的图片
-const downloadBtn = document.getElementById('downloadButton');
-downloadBtn.addEventListener('click', () => {
-  const img = pics[0];
-  if (!img.src) return alert('请先上传图片');
-  const w = img.naturalWidth, h = img.naturalHeight;
-  const defs = document.querySelector('#filterSvg defs').innerHTML;
-  const filterAttr = img.style.filter || 'url(#noise) url(#bloomFilter) url(#glitchFilter) url(#watercolorFilter)';
-  const svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${w}\" height=\"${h}\">` +
-              `<defs>${defs}</defs>` +
-              `<image href=\"${img.src}\" width=\"${w}\" height=\"${h}\" filter=\"${filterAttr}\"/>` +
-              `</svg>`;
-  const blob = new Blob([svg], { type: 'image/svg+xml' });
-  const url = URL.createObjectURL(blob);
-  const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+const oldBtn = document.getElementById('downloadButton');
+const downloadBtn = oldBtn.cloneNode(true);
+oldBtn.parentNode.replaceChild(downloadBtn, oldBtn);
+
+
+downloadBtn.addEventListener('click', (event) => {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  const img = document.querySelector('.overlay .container img');
+  if (!img) return;
+
+  
+  const { width, height } = img.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+
+  const origSvg = document.getElementById('filterSvg');
+  if (!origSvg) {
+    console.error('找不到 filterSvg');
+    return;
+  }
+  const defs = origSvg.querySelector('defs').cloneNode(true);
+
+
+  const SVG_NS   = 'http://www.w3.org/2000/svg';
+  const XLINK_NS = 'http://www.w3.org/1999/xlink';
+  const svgEl = document.createElementNS(SVG_NS, 'svg');
+  svgEl.setAttribute('xmlns', SVG_NS);
+  svgEl.setAttribute('xmlns:xlink', XLINK_NS);
+  svgEl.setAttribute('width',  width);
+  svgEl.setAttribute('height', height);
+  svgEl.appendChild(defs);
+
+  const svgImg = document.createElementNS(SVG_NS, 'image');
+  svgImg.setAttribute('width',  width);
+  svgImg.setAttribute('height', height);
+  svgImg.setAttributeNS(XLINK_NS, 'href', img.src);
+
+  
+  let filterValue = '';
+  const styleAttr = img.getAttribute('style') || '';
+  const m = styleAttr.match(/filter\s*:\s*([^;]+);/);
+  filterValue = m ? m[1] : window.getComputedStyle(img).getPropertyValue('filter');
+  svgImg.setAttribute('filter', filterValue);
+
+  svgEl.appendChild(svgImg);
+
+ 
+  const svgStr  = new XMLSerializer().serializeToString(svgEl);
+  const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+  const url     = URL.createObjectURL(svgBlob);
+
+ 
+  const canvas = document.createElement('canvas');
+  canvas.width  = width  * dpr;
+  canvas.height = height * dpr;
   const ctx = canvas.getContext('2d');
-  const tmp = new Image();
-  tmp.onload = () => { ctx.drawImage(tmp, 0, 0); URL.revokeObjectURL(url);
-    const png = canvas.toDataURL('image/png');
-    const a = document.createElement('a'); a.href = png; a.download = 'filtered-image.png'; a.click();
+  ctx.scale(dpr, dpr);
+
+  const raster = new Image();
+  raster.onload = () => {
+    ctx.drawImage(raster, 0, 0);
+    URL.revokeObjectURL(url);
+
+   
+    const pngUrl = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = pngUrl;
+    a.download = 'edited-image.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
-  tmp.src = url;
+  raster.onerror = err => {
+    URL.revokeObjectURL(url);
+    console.error('Rasterize SVG 失败', err);
+  };
+  raster.src = url;
+
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  const panel = document.getElementById('filter2Panel');
+  const glowSize = document.getElementById('glowSizeControl').closest('.control-group');
+  const glowOpacity = document.getElementById('glowOpacityControl').closest('.control-group');
+  panel.insertBefore(glowOpacity, glowSize);
 });

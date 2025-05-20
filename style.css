@@ -12,74 +12,70 @@ body {
 html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sans-serif; }
 
 /* Intro overlay */
-#intro { position: fixed; inset: 0; background: #000; color: #fff;
-  display: flex; align-items: center; justify-content: center; flex-direction: column;
-  z-index: 1000; opacity: 0; animation: fadeIn 0.8s forwards; }
-
+#intro {
+  position: fixed; inset: 0; background: #000; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; opacity: 0; animation: fadeIn 0.8s forwards;
+}
 #intro.fade-out { animation: fadeOut 0.8s forwards; }
 
-#intro-content h1 { font-size: 2rem; 
-  margin-bottom: 20px; }
-#startBtn {
-  position: absolute;
-  top: 10vw;
-  right: 18vw;
-  z-index: 1001;
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 1.1rem;
-  padding: 10px 20px;
-  background: #444;
+#intro-content { width: 90vw; max-width: 800px; padding: 20px; text-align: center; }
+
+/* Typing effect title */
+#intro-title {
+  font-size: 2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  margin-bottom: 10px;
   color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+}
+
+/* Typing effect subtitle */
+#intro-subtitle {
+  font-size: 1.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+/* 光标 */
+.cursor::after { content: '|'; margin-left: 2px; animation: blink 0.7s step-end infinite; }
+@keyframes blink { 0%,100%{opacity:0;}50%{opacity:1;} }
+
+/* Start button */
+#startBtn {
+  position: absolute; top: 20px; right: 20px; z-index: 1001;
+  font-family: 'Segoe UI', sans-serif; font-size: 1.1rem;
+  padding: 10px 20px; background: #444; color: #fff;
+  border: none; border-radius: 4px; cursor: pointer;
 }
 
 /* Header marquee */
 header { position: fixed; top: 0; left: 0; width: 100%; height: 30px;
   background: #fff; transform: translateY(-100%); transition: transform 0.5s ease;
-  z-index: 999; border-top: 1px solid #000; border-bottom: 1px solid #000; }
+  z-index: 999; border-top: 1px solid #000; border-bottom: 1px solid #000;
+}
 header.active { transform: translateY(0); }
 
-/* Perfect seamless marquee */
-.marquee { width: 100%; height: 30px; overflow: hidden; position: relative; }
-
-.marquee-inner {
-  display: inline-flex;
-  margin-right: 200px;  /* 控制段落之间距离 */
-  white-space: nowrap;
-  position: absolute;
-  /* 无缝循环滚动：总长度为两组内容，平移50%元素宽度即可移动一组 */
-  animation: scroll 20s linear infinite;
-  will-change: transform;
-}
-.marquee-inner span {
-  flex-shrink: 0;
-  margin-right: 200px;  /* 控制段落之间距离 */
-  line-height: 30px;
- 
-}
-
-/* Main content spacing */
-main { margin-top: 30px; padding: 20px; height: calc(100vh - 30px); overflow: auto; }
-
-/* Keyframes */
-@keyframes scroll {
-  from { transform: translateX(0%); }
-  to { transform: translateX(-50%); }
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+/* Seamless marquee */
+.marquee { width:100%; height:30px; overflow:hidden; position:relative; }
+.marquee-inner { display:inline-flex; white-space:nowrap; position:absolute; animation: scroll 20s linear infinite; will-change:transform; }
+.marquee-inner span { flex-shrink:0; margin-right:200px; line-height:30px; color:#000; font-size:14px;  }
 
 
 
+/* Animations */
+@keyframes scroll { from{transform:translateX(0%);} to{transform:translateX(-50%);} }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+@keyframes fadeOut { from{opacity:1;} to{opacity:0;} }
 
-h1 {
-    width: 30%;
+
+h2 {
+    width: 100%;
     font-size: 10vw;
-    text-align: center;
     line-height: 2em;
-    margin: 55vh;
+    margin: 34vh;
     color: rgb(202, 202, 202);
     font-weight: normal;
     margin-top: -2.5vw;
@@ -88,16 +84,43 @@ h1 {
 svg {
     position: absolute;
 }
+
 .overlay {
-    position: absolute;
-    top: 0;
+  position: absolute;
+  top: 0;
+  left: 0;       /* 新增：起点 */
+  right: 0;      /* 新增：终点 */
+  width: 100%;   /* 确保占满全宽 */
+}
+
+.overlay .button-group,
+.overlay .control-panel {
+  width: 100%;
+  box-sizing: border-box;  /* 包括 padding */
+}
+
+.overlay .container {
+  width: 80vw;        /* 最大宽度 */
+  height: 70vh;       /* 最大高度 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  margin: 1rem auto;
+}
+
+/* 保持宽高比，横图纵图都能完整显示 */
+.overlay .container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 .container {
     display: grid;
     grid-template-columns: repeat(3, auto);
     align-items: center;
-    height: 95vh;
+    height: 35vw;
     width: 80%;
     margin: 0 auto;
     margin-top: 1px;
@@ -106,12 +129,57 @@ svg {
 img {
     width: 100%;
     margin-top:80px;
+    transform: scale(0.7);
     filter: url(#noise);
     filter: url(#bloomFilter);
     filter: url(#glitchFilter);
     filter: url(#watercolorFilter);
     
 }
+
+.button-group {
+  display: flex;              
+  justify-content: center;     
+  /* 如果你需要它垂直方向也居中： */
+  align-items: center;
+  width: 100%; 
+}                
+
+#uploadImage,
+#downloadButton {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+  background: linear-gradient(135deg, #000000, #e7e7e7);
+  color: #fff;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  user-select: none;
+  margin: 1vw;
+  justify-content: center; 
+
+ 
+  
+  &:hover {
+    background: linear-gradient(135deg, #3B7BC6, #40B3A8);
+    transform: translateY(-2px);
+  }
+  &:active {
+    transform: translateY(0);
+    background: linear-gradient(135deg, #3568A8, #379286);
+  }
+}
+
+
+#downloadButton {
+  margin-left: 1rem;
+}
+
 
 
 

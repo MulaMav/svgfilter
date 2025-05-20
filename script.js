@@ -229,7 +229,7 @@ downloadBtn.addEventListener('click', (event) => {
 
   const origSvg = document.getElementById('filterSvg');
   if (!origSvg) {
-    console.error('找不到 filterSvg');
+    console.error('cannot find filterSvg');
     return;
   }
   const defs = origSvg.querySelector('defs').cloneNode(true);
@@ -286,15 +286,9 @@ downloadBtn.addEventListener('click', (event) => {
   };
   raster.onerror = err => {
     URL.revokeObjectURL(url);
-    console.error('Rasterize SVG 失败', err);
+    console.error('Rasterize SVG fail', err);
   };
   raster.src = url;
 
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-  const panel = document.getElementById('filter2Panel');
-  const glowSize = document.getElementById('glowSizeControl').closest('.control-group');
-  const glowOpacity = document.getElementById('glowOpacityControl').closest('.control-group');
-  panel.insertBefore(glowOpacity, glowSize);
-});
